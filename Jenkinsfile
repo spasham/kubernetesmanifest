@@ -1,43 +1,28 @@
-pipeline {
-    agent any
+node {
+    def app
 
-    environment {
-        GIT_REPO = 'https://github.com/spasham/kubernetesmanifest.git'
-        GIT_BRANCH = 'main'
-        GIT_CREDENTIALS_ID = 'github' // Replace with your Jenkins credentials ID
+    stage('Clone repository') {
+      
+
+        checkout scm
     }
 
-    stages {
-        stage('Checkout') {
-            steps {
-                checkout([
-                    $class: 'GitSCM',
-                    branches: [[name: '*/main']],
-                    doGenerateSubmoduleConfigurations: false,
-                    extensions: [],
-                    userRemoteConfigs: [[url: "${env.GIT_REPO}", credentialsId: "${env.GIT_CREDENTIALS_ID}"]]
-                ])
-            }
-        }
-
-        stage('Commit Changes') {
-            steps {
-                sh 'git commit -m "Done by Jenkins Job changemanifest: 5"'
-            }
-        }
-
-        stage('Push Changes') {
-            steps {
-                script {
-                    withCredentials([usernamePassword(credentialsId: "${env.GIT_CREDENTIALS_ID}", passwordVariable: 'GIT_PASSWORD', usernameVariable: 'GIT_USERNAME')]) {
-                        sh '''
-                        git config --global user.email "jenkins@example.com"
-                        git config --global user.name "Jenkins"
-                        git pull https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/spasham/kubernetesmanifest.git ${env.GIT_BRANCH} --allow-unrelated-histories
-                        git push https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/spasham/kubernetesmanifest.git HEAD:${env.GIT_BRANCH}
-                        '''
-                    }
-                }
-            }
-        }
+    stage('Update GIT') {
+            script {
+                catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
+                    withCredentials([usernamePassword(credentialsId: 'github', passwordVariable: 'GIT_PASSWORD', usernameVariable: 'GIT_USERNAME')]) {
+                        //def encodedPassword = URLEncoder.encode("$GIT_PASSWORD",'UTF-8')
+                        sh "git config user.email shivak981@gmail.com"
+                        sh "git config user.name spasham"
+                        //sh "git switch master"
+                        sh "cat deployment.yaml"
+                        sh "sed -i 's+shivak981/meters2feet.*+shivak981/meters2feet:${DOCKERTAG}+g' deployment.yaml"
+                        sh "cat deployment.yaml"
+                        sh "git add ."
+                        sh "git commit -m 'Done by Jenkins Job changemanifest: ${env.BUILD_NUMBER}'"
+                        sh "git push https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/${GIT_USERNAME}/kubernetesmanifest.git HEAD:main"
+      }
     }
+  }
+}
+}

@@ -19,7 +19,6 @@ node {
                         sh "cat deployment.yaml"
                         sh "sed -i 's+shivak981/meters2feet.*+shivak981/meters2feet:${DOCKERTAG}+g' deployment.yaml"
                         sh "cat deployment.yaml"
-                        sh "git merge --strategy-option ours FETCH_HEAD || true"
                         sh "git add -A"
                         sh "git commit -m 'Done by Jenkins Job changemanifest: ${env.BUILD_NUMBER}'"
                         sh "git push https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/${GIT_USERNAME}/kubernetesmanifest.git HEAD:main --force"

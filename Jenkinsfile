@@ -41,14 +41,3 @@ pipeline {
             }
         }
     }
-
-    post {
-        always {
-            // Add any cleanup steps here
-        }
-        failure {
-            // Add any steps to take on failure here
-        }
-    }
-}
-

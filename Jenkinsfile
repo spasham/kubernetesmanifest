@@ -15,6 +15,7 @@ node {
                         sh "git config user.email shivak981@gmail.com"
                         sh "git config user.name spasham"
                         //sh "git switch master"
+                        sh "git checkout main"
                         sh "git pull"
                         sh "cat deployment.yaml"
                         sh "sed -i 's+shivak981/meters2feet.*+shivak981/meters2feet:${DOCKERTAG}+g' deployment.yaml"
